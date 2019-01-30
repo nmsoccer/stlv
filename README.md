@@ -31,10 +31,9 @@ A Simple TLV-Format Pack and Unpack Library
 
 
 * value (1-N字节)  
-封装的数据
+封装的数据  
 
-
-
+  
 ### 数据类型
 
 |       类型        |   长度    |    说明       |
