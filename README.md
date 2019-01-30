@@ -23,9 +23,9 @@ A Simple TLV-Format Pack and Unpack Library
 | extra    |   0,2,4字节  |flag==0 则extra=0; flag==1则value记录extra的字节数同时extra=2|4字节长，记录值的长度 |
 
 
-
 * value (1-N字节)  
 封装的数据
+
 
 ### 数据类型
 
@@ -80,5 +80,80 @@ A Simple TLV-Format Pack and Unpack Library
   * _ps: 对于值为TLV类型的包，会持续解封到值为基本类型或者字节数组为止_
   
   
+### SAMPLE
+_下面的代码均源于demo/demo.c_
+
+* 普通数据
+```
+  ...
+  
+  char *bf1 = NULL;
+  char *bf2 = NULL;
+  long value = 11532;
+  unsigned int len = 0;
+  unsigned int len1 = 0;
+  unsigned int len2 = 0;
+  char type = -1;
+
+  printf("value:0x%X len:%d\n" , value , sizeof(value));
+  //primitive
+  bf1 = STLV_BUFF_ALLOC(sizeof(value));
+  len1 = STLV_PACK_LONG(bf1 , &value);
+  printf("pack value len is %d\n" , len1);
+  STLV_DUMP_PACK(bf1);
+
+  //tlv
+  bf2 = STLV_BUFF_ALLOC(len1); 
+  len2 = STLV_PACK_TLV(bf2 , bf1 , len1);
+  printf("pack tlv len is %d\n" , len2);
+  STLV_DUMP_PACK(bf2);
+  
+  //unpack
+  value = 0;
+  len = STLV_UNPACK(&type , &value , bf2 , len2);
+  printf("unpack from tlv len:%d and result type:%d value 0x%X len is %d\n" , len2 , type , value , len);
 
 
+  STLV_BUFF_FREE(bf1);
+  STLV_BUFF_FREE(bf2);
+
+```
+上面先用TLV封装了一个long类型数据，然后再对封装后的TLV数据进行再一次封装，然后解封
+```
+value:0x2D0C len:8
+pack value len is 12
+pack tlv len is 16
+unpack from tlv len:16 and result type:4 value 0x2D0C len is 8
+
+```
+
+* 复合数据
+```
+  ...
+  char array[201] = {0};
+  
+  //array
+  array[0] = 'A';
+  strcpy(&array[18] , "hello world!");
+  array[sizeof(array)-1] = 'Z';
+  printf("array size:%d info:[%c][%s][%c]\n" , sizeof(array) , array[0],&array[18] , array[sizeof(array)-1]);
+
+  bf1 = STLV_BUFF_ALLOC(sizeof(array));
+  len1 = STLV_PACK_ARRAY(bf1 , array , sizeof(array));
+  printf("pack array len is %d\n" , len1);
+  STLV_DUMP_PACK(bf1);
+
+    //unpack
+  memset(array , 0 , sizeof(array));
+  len2 = STLV_UNPACK(&type , array , bf1 , len1); 
+  printf("unpack from array len:%d and result type:%d value:[%c][%s][%c] len is %d\n" , len1 , type , array[0],&array[18] , 
+  array[sizeof(array)-1] , len2);
+
+  STLV_BUFF_FREE(bf1);
+```
+上面对array字节数组进行了封装  
+```
+  array size:201 info:[A][hello world!][Z]
+  pack array len is 207
+  unpack from array len:207 and result type:17 value:[A][hello world!][Z] len is 201
+```
