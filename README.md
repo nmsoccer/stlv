@@ -79,6 +79,27 @@ A Simple TLV-Format Pack and Unpack Library
   * return: 0 failed; >0 解装后值的长度(unsigned int)  
   * _ps: 对于值为TLV类型的包，会持续解封到值为基本类型或者字节数组为止_
   
+### 安装
+该库只依赖于slog作为日志记录，需要先安装slog
+* 安装slog
+  * https://github.com/nmsoccer/slog 下载slog-master.zip  
+  * 解压然后cd slog/  
+  * 执行./install(一般需要root用户权限)  
+  * 安装完毕
+
+* 安装stlv
+  * https://github.com/nmsoccer/stlv 下载stlv-master.zip
+  * 解压然后cd stlv/
+  * 执行./install(一般需要root用户权限)
+  * 安装完毕
+  
+* 说明
+  * 头文件安装于/usr/local/include/stlv/
+  * 库文件安装于/usr/local/lib/
+  * 以demo.c为例编译
+  * 动态编译 gcc -g demo.c -lstlv -o demo
+  * 静态编译 gcc -g demo.c -Wl,-Bstatic -lstlv -Wl,-Bdynamic -o demo
+  * 如果找不到动态库请先将/usr/local/lib加入到/etc/ld.so.conf 然后执行/sbin/ldconfig  
 
 
 ### SAMPLE
