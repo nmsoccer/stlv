@@ -34,6 +34,7 @@ A Simple TLV-Format Pack and Unpack Library
 封装的数据
 
 
+
 ### 数据类型
 
 |       类型        |   长度    |    说明       |
@@ -51,6 +52,8 @@ A Simple TLV-Format Pack and Unpack Library
 * _整型数据打包时会转换成网络序，解包会转成主机序，适配大小端通信_
 * _浮点型数据由于不同系统实现不同，打包时按字节复制透传，不做网络序转换_
 * _复合数据类型按字节复制_  
+
+
 
 ### API
 * ```STLV_BUFF_ALLOC(vlen)``` 为产生的STLV包分配缓冲区    
@@ -90,6 +93,7 @@ A Simple TLV-Format Pack and Unpack Library
   * p:stlv包地址  
   
   
+  
 ### 安装
 该库只依赖于slog作为日志记录，需要先安装slog
 * 安装slog
@@ -111,6 +115,7 @@ A Simple TLV-Format Pack and Unpack Library
   * 动态编译 gcc -g demo.c -lstlv -o demo
   * 静态编译 gcc -g demo.c -Wl,-Bstatic -lstlv -Wl,-Bdynamic -o demo
   * 如果找不到动态库请先将/usr/local/lib加入到/etc/ld.so.conf 然后执行/sbin/ldconfig  
+
 
 
 ### SAMPLE
