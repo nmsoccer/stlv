@@ -19,7 +19,7 @@ A Simple TLV-Format Pack and Unpack Library
 |:------:  | :----------:| :-----------:| 
 | class    |   [6-7]bit  |       =1      |
 | obj      |   [5] bit   |0：基础类型(primitive);1:复合类型(array or tlv) | 
-| num(type)|   [0-4]bit  |_不用来存储数据的num，而是存储数据类型 refer STLV_TYPE_ |
+| num(type)|   [0-4]bit  |_不用来存储数据的tag_num，而是存储数据类型. refer STLV_TYPE_ |
 
 * LEN (1字节+(0|2|4)字节)
 
