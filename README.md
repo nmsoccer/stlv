@@ -12,7 +12,7 @@ A Simple TLV-Format Pack and Unpack Library
 |:------:  | :----------:| :-----------:| 
 | class    |   [6-7]bit  |       =1      |
 | obj      |   [5] bit   |0：基础类型(primitive);1:复合类型(array or tlv) | 
-| num(type)|   [0-4]bit  |数据类型 refer STLV_TYPE |
+| num(type)|   [0-4]bit  |_不用来存储数据的num，而是存储数据类型 refer STLV_TYPE_ |
 
 * LEN (1字节+(0|2|4)字节)
 
@@ -78,6 +78,10 @@ A Simple TLV-Format Pack and Unpack Library
   * l: 待解封的STLV包缓冲区长(unsigned int)
   * return: 0 failed; >0 解装后值的长度(unsigned int)  
   * _ps: 对于值为TLV类型的包，会持续解封到值为基本类型或者字节数组为止_
+  
+* ```STLV_DUMP_PACK(p)``` 打印一个STLV包到stlv.log日志下
+  * p:stlv包地址  
+  
   
 ### 安装
 该库只依赖于slog作为日志记录，需要先安装slog
