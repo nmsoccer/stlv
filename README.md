@@ -3,7 +3,7 @@ A Simple TLV-Format Pack and Unpack Library
 一个简单的基于tlv格式的数据封装和解封库
 
 ### 数据格式
-数据格式主要基于Ber-TLV描述，并进行了一定的修改
+数据格式主要基于Ber-TLV描述，并进行了一定的修改,主要是在定长TAG以及tag_num存储类型
 格式地址升序  
 
 * TAG (1字节)
