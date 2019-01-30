@@ -55,7 +55,7 @@ typedef enum
  * @p:封装后的缓冲区指针(unsigned char *)
  * @v:将要封装的数据指针(unsigned char *)
  * @[l]数据长度(unsigned int)
- * @return: -1 failed; >=0 封装后的长度(unsigned int)
+ * @return: 0 failed; >0 封装后的长度(unsigned int)
  * warn:浮点型不会进行网络序转换，而直接按字节复制透传
  */
 //打包char
@@ -80,7 +80,7 @@ typedef enum
 
 /*
  * STLV解包
- * @t:解封的数据类型 STL_TYPE
+ * @t:解封的数据类型 STL_TYPE(char *)
  * @v:解封的数据地址(unsigned char *)
  * @p:待解封的STLV包缓冲区地址(unsigned char *)
  * @l:STLV包缓冲区长(unsigned int)
