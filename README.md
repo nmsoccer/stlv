@@ -53,7 +53,7 @@ A Simple TLV-Format Pack and Unpack Library
 * ```STLV_BUFF_FREE(ppack)``` 释放由STLV_BUFF_ALLOC分配的缓冲区      
   * ppack:缓冲区地址
 
-* STLV_PACK_** 打包数据  
+* ```STLV_PACK_**``` 打包数据  
   * p:封装后的缓冲区指针(unsigned char * )
   * v:将要封装的数据指针(unsigned char * )
   * l:数据长度(unsigned int)
@@ -79,7 +79,8 @@ A Simple TLV-Format Pack and Unpack Library
   * return: 0 failed; >0 解装后值的长度(unsigned int)  
   * _ps: 对于值为TLV类型的包，会持续解封到值为基本类型或者字节数组为止_
   
-  
+
+
 ### SAMPLE
 _下面的代码均源于demo/demo.c_
 
