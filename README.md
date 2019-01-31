@@ -27,7 +27,7 @@ A Simple TLV-Format Pack and Unpack Library
 |:------:  | :-----------:| :-----------:| 
 | flag     |   [7]bit     |0:单字节表示长度; 1:后续的字节表示长度       |
 | value    |   [0-6] bit  |flag==0:表示数据的实际长度; flag==1表示后续的存储长度的字节数 |
-| extra    |   0,2,4字节  |flag==0 则extra=0; flag==1则value记录extra的字节数同时extra=2|4字节长，记录值的长度 |
+| extra    |   0,2,4字节  |flag==0 则extra=0; flag==1则value记录extra的字节数同时extra=2 or 4字节长，记录值的长度 |
 
 
 * value (1-N字节)  
