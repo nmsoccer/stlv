@@ -65,7 +65,7 @@ int main(int argc , char **argv)
   //float
   printf("float value:%lf\n" , float64);
   bf1 = STLV_BUFF_ALLOC(sizeof(float64));
-  len1 = STLV_PACK_ARRAY(bf1 , &float64 , sizeof(float64));
+  len1 = STLV_PACK_DOUBLE(bf1 , &float64 , sizeof(float64));
   printf("pack float64 len is %d\n" , len1);
 
     //unpack
