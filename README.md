@@ -111,8 +111,8 @@ A Simple TLV-Format Pack and Unpack Library
   * 头文件安装于/usr/local/include/stlv/
   * 库文件安装于/usr/local/lib/
   * 以demo.c为例编译
-  * 动态编译 gcc -g demo.c -lstlv -o demo
-  * 静态编译 gcc -g demo.c -Wl,-Bstatic -lstlv -Wl,-Bdynamic -o demo
+  * 动态编译 gcc -g demo.c -lstlv -lslog -o demo
+  * 静态编译 gcc -g demo.c -Wl,-Bstatic -lstlv -Wl,-Bdynamic -lslog -o demo
   * 如果找不到动态库请先将/usr/local/lib加入到/etc/ld.so.conf 然后执行/sbin/ldconfig  
 
 
