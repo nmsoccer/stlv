@@ -62,7 +62,7 @@ A Simple TLV-Format Pack and Unpack Library
 * ```STLV_BUFF_FREE(ppack)``` 释放由STLV_BUFF_ALLOC分配的缓冲区      
   * ppack:缓冲区地址
 
-* ```STLV_PACK_**``` 打包数据  
+* ```STLV_PACK_**(p,v,[l])``` 打包数据  
   * p:封装后的缓冲区指针(unsigned char * )
   * v:将要封装的数据指针(unsigned char * )
   * l:数据长度(unsigned int)
