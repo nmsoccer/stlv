@@ -9,7 +9,7 @@ A Simple TLV-Format Pack and Unpack Library
 
 |+--------|-------------|--------|---------+|
 |:-------:|:-----------:|:------:|:-------: |
-|    1B   | 1B  + 0,2,4B |    NB    |    2B  |
+|    1B   | 1B  + 0,2,4B |    nB    |    2B  |
 |  TAG    | LEN + (EXTRA)  |  VALUE  | CheckSum|
 |+--------|--------------|--------|---------+|
 
@@ -130,6 +130,7 @@ _下面的代码均源于demo/demo.c_
   unsigned int len = 0;
   unsigned int len1 = 0;
   unsigned int len2 = 0;
+  unsigned int stlv_len = 0;
   char type = -1;
 
   printf("value:0x%X len:%d\n" , value , sizeof(value));
@@ -147,8 +148,8 @@ _下面的代码均源于demo/demo.c_
   
   //unpack
   value = 0;
-  len = STLV_UNPACK(&type , &value , bf2 , len2);
-  printf("unpack from tlv len:%d and result type:%d value 0x%X len is %d\n" , len2 , type , value , len);
+  len = STLV_UNPACK(&type , &value , bf2 , len2 , &stlv_len);
+  printf("unpack from tlv len:%d and result type:%d value 0x%X len is %d stlv_len:%d\n" , len2 , type , value , len , stlv_len);
 
 
   STLV_BUFF_FREE(bf1);
@@ -160,7 +161,7 @@ _下面的代码均源于demo/demo.c_
 value:0x2D0C len:8
 pack value len is 12
 pack tlv len is 16
-unpack from tlv len:16 and result type:4 value 0x2D0C len is 8
+unpack from tlv len:16 and result type:4 value 0x2D0C len is 8, stlv_len:16
 
 ```
 
@@ -182,9 +183,8 @@ unpack from tlv len:16 and result type:4 value 0x2D0C len is 8
 
     //unpack
   memset(array , 0 , sizeof(array));
-  len2 = STLV_UNPACK(&type , array , bf1 , len1); 
-  printf("unpack from array len:%d and result type:%d value:[%c][%s][%c] len is %d\n" , len1 , type , array[0],&array[18] , 
-  array[sizeof(array)-1] , len2);
+  len2 = STLV_UNPACK(&type , array , bf1 , len1 , &stlv_len); 
+  printf("unpack from array len:%d and result type:%d value:[%c][%s][%c] len is %d , stlv_len:%d\n" , len1 , type , array[0],&array[18] , array[sizeof(array)-1] , len2 , stlv_len);
 
   STLV_BUFF_FREE(bf1);
 ```
@@ -192,5 +192,5 @@ unpack from tlv len:16 and result type:4 value 0x2D0C len is 8
 ```
   array size:201 info:[A][hello world!][Z]
   pack array len is 207
-  unpack from array len:207 and result type:17 value:[A][hello world!][Z] len is 201
+  unpack from array len:207 and result type:17 value:[A][hello world!][Z] len is 201 , stlv_len:207
 ```
