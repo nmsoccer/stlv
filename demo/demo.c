@@ -16,6 +16,7 @@ int main(int argc , char **argv)
   unsigned int len = 0;
   unsigned int len1 = 0;
   unsigned int len2 = 0;
+  unsigned int stlv_len = 0;
   int i;
   char type = -1;
 
@@ -34,8 +35,8 @@ int main(int argc , char **argv)
   
   //unpack
   value = 0;
-  len = STLV_UNPACK(&type , &value , bf2 , len2);
-  printf("unpack from tlv len:%d and result type:%d value 0x%X len is %d\n" , len2 , type , value , len);
+  len = STLV_UNPACK(&type , &value , bf2 , len2 , &stlv_len);
+  printf("unpack from tlv len:%d and result type:%d value 0x%X len is %d , stlv_len:%d\n" , len2 , type , value , len , stlv_len);
 
 
   STLV_BUFF_FREE(bf1);
@@ -55,9 +56,9 @@ int main(int argc , char **argv)
 
     //unpack
   memset(array , 0 , sizeof(array));
-  len2 = STLV_UNPACK(&type , array , bf1 , len1); 
-  printf("unpack from array len:%d and result type:%d value:[%c][%s][%c] len is %d\n" , len1 , type , array[0],&array[18] , 
-  array[sizeof(array)-1] , len2);
+  len2 = STLV_UNPACK(&type , array , bf1 , len1 , &stlv_len); 
+  printf("unpack from array len:%d and result type:%d value:[%c][%s][%c] len is %d , stlv_len:%d\n" , len1 , type , array[0],&array[18] , 
+  array[sizeof(array)-1] , len2 , stlv_len);
 
   STLV_BUFF_FREE(bf1);
 
@@ -65,13 +66,13 @@ int main(int argc , char **argv)
   //float
   printf("float value:%lf\n" , float64);
   bf1 = STLV_BUFF_ALLOC(sizeof(float64));
-  len1 = STLV_PACK_DOUBLE(bf1 , &float64 , sizeof(float64));
+  len1 = STLV_PACK_ARRAY(bf1 , &float64 , sizeof(float64));
   printf("pack float64 len is %d\n" , len1);
 
     //unpack
   float64 = 0;
-  len2 = STLV_UNPACK(&type , &float64 , bf1 , len1);
-  printf("unpack from float64 len:%d and result type:%d value %lf len is %d\n" , len1 , type , float64 , len2);
+  len2 = STLV_UNPACK(&type , &float64 , bf1 , len1 , &stlv_len);
+  printf("unpack from float64 len:%d and result type:%d value %lf len is %d stlv_len:%d\n" , len1 , type , float64 , len2 , stlv_len);
   STLV_BUFF_FREE(bf1);
 
   return 0;

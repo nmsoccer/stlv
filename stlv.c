@@ -154,9 +154,12 @@ NO_API unsigned int pack_stlv(char type , OUT unsigned char *packed_buff , IN un
  * @value:解封的数据
  * @packed_buff:待解封的STLV包
  * @p_len:STLV包缓冲区长
+ * @p_real_len:本次解压获得的STLV完整包长度
  * @return: 0 failed; >0 解装后值的长度
+ * ps:
  */
-NO_API unsigned int unpack_stlv(char *type , OUT unsigned char *value , IN unsigned char *packed_buff , unsigned int p_len)
+NO_API unsigned int unpack_stlv(char *type , OUT unsigned char *value , IN unsigned char *packed_buff , unsigned int p_len ,
+		unsigned int *p_real_len)
 {
 	int slog_fd = -1;
 	STLV_PACK *pack = (STLV_PACK *)packed_buff;
@@ -250,6 +253,10 @@ NO_API unsigned int unpack_stlv(char *type , OUT unsigned char *value , IN unsig
 		return 0;
 	}
 
+	//stlv real_size
+	if(p_real_len)
+		*p_real_len = (head_len + v_len + 2);
+
 	//value start
 	v_start = packed_buff + head_len;
 
@@ -269,7 +276,7 @@ NO_API unsigned int unpack_stlv(char *type , OUT unsigned char *value , IN unsig
 	{
 		//TLV
 		if(pack->tag.num == STLV_T_CO_TLV)
-			return unpack_stlv(type , value , v_start , v_len);
+			return unpack_stlv(type , value , v_start , v_len , NULL);
 
 		//ARRAY
 		*type = STLV_T_CO_ARRAY;
