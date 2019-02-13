@@ -80,11 +80,12 @@ A Simple TLV-Format Pack and Unpack Library
 |```STLV_PACK_ARRAY(p,v,l)``` |   打包一个字节数组      |
 |```STLV_PACK_TLV(p,v,l)```   |   打包一个TLV格式数据   |  
 
-* ```STLV_UNPACK(t , v , p , l)```  解包一个STLV格式封装的数据
+* ```STLV_UNPACK(t , v , p , l , rl)```  解包一个STLV格式封装的数据
   * t: 解封的数据类型(char * ) refer STLV_TYPE_xx
   * v: 解封后的数据地址(unsigned char * )
   * p: 待解封的STLV包缓冲区地址(unsigned char * )
-  * l: 待解封的STLV包缓冲区长(unsigned int)
+  * l: 待解封的STLV包缓冲区长(unsigned int)  
+  * rl:本次解压获得的STLV完整包长度(unsigned int * )    
   * return: 0 failed; >0 解装后值的长度(unsigned int)  
   * _ps: 对于值为TLV类型的包，会持续解封到值为基本类型或者字节数组为止_
   
