@@ -81,6 +81,12 @@ extern "C"{
 //safe len
 #define STLV_PACK_SAFE_LEN(vlen) (2+sizeof(int)+2+vlen) //tag+len+most(len.extra)+value_len
 
+//FUNCTION DECLARE --- NO APIs
+NO_API unsigned int pack_stlv(char type , OUT unsigned char *packed_buff , IN unsigned char *value , unsigned int vlen);
+NO_API unsigned int pack_stlv_long(unsigned char *packed_buff , unsigned char *value);
+NO_API unsigned int unpack_stlv(int *info , OUT unsigned char *value , IN unsigned char *src_buff , unsigned int buff_len ,
+		unsigned int *pkg_len);
+
 #ifdef __cplusplus
 }
 #endif

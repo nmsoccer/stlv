@@ -59,36 +59,41 @@ typedef enum
  * warn:浮点型不会进行网络序转换，而直接按字节复制透传
  */
 //打包char
-#define STLV_PACK_CHAR(p , v) pack_stlv(STLV_TYPE_INT8 , (p) , (v) , 0)
+#define STLV_PACK_CHAR(p , v) pack_stlv(STLV_TYPE_INT8 , (unsigned char *)(p) , (unsigned char *)(v) , 0)
 //打包short
-#define STLV_PACK_SHORT(p , v) pack_stlv(STLV_TYPE_INT16 , (p) , (v) , 0)
+#define STLV_PACK_SHORT(p , v) pack_stlv(STLV_TYPE_INT16 , (unsigned char *)(p) , (unsigned char *)(v) , 0)
 //打包int
-#define STLV_PACK_INT(p , v) pack_stlv(STLV_TYPE_INT32 , (p) , (v) , 0)
+#define STLV_PACK_INT(p , v) pack_stlv(STLV_TYPE_INT32 , (unsigned char *)(p) , (unsigned char *)(v) , 0)
 //打包long
 #define STLV_PACK_LONG(p , v) pack_stlv_long((p) , (v))
 //打包LONGLONG
-#define STLV_PACK_LLONG(p , v) pack_stlv(STLV_TYPE_INT64 , (p) , (v) , 0)
+#define STLV_PACK_LLONG(p , v) pack_stlv(STLV_TYPE_INT64 , (unsigned char *)(p) , (unsigned char *)(v) , 0)
 //打包 FLOAT32
-#define STLV_PACK_FLOAT(p , v) pack_stlv(STLV_TYPE_FLOAT32 , (p) , (v) , 0);
+#define STLV_PACK_FLOAT(p , v) pack_stlv(STLV_TYPE_FLOAT32 , (unsigned char *)(p) , (unsigned char *)(v) , 0);
 //打包 FLOAT64
-#define STLV_PACK_DOUBLE(p , v) pack_stlv(STLV_TYPE_FLOAT64 , (p) , (v) , 0);
+#define STLV_PACK_DOUBLE(p , v) pack_stlv(STLV_TYPE_FLOAT64 , (unsigned char *)(p) , (unsigned char *)(v) , 0);
 //打包数组
-#define STLV_PACK_ARRAY(p , v , l) pack_stlv(STLV_TYPE_ARRAY , (p) , (v) , (l))
+#define STLV_PACK_ARRAY(p , v , l) pack_stlv(STLV_TYPE_ARRAY , (unsigned char *)(p) , (unsigned char *)(v) , (l))
 //打包STLV包
-#define STLV_PACK_TLV(p , v ,l) pack_stlv(STLV_TYPE_TLV , (p) , (v) , (l))
+#define STLV_PACK_TLV(p , v ,l) pack_stlv(STLV_TYPE_TLV , (unsigned char *)(p) , (unsigned char *)(v) , (l))
 
 
+#define STLV_UNPACK_FAIL_ERR -1	//数据格式错误
+#define STLV_UNPACK_FAIL_BUFF_LEN -2 //待解包缓冲区长度不足
+#define STLV_UNPACK_FAIL_CHECK_SUM -3 //校验和错误
 /*
  * STLV解包
- * @t:解封的数据类型 STL_TYPE
+  * @info: (int *)
+ *     解封成功则>=0 填充解封的数据类型 refer STLV_T_PR_XX or STLV_T_CO_XX
+ *     解封失败则<0   填充错误码 refer STLV_UNPACK_FAIL_XX
  * @v:解封的数据地址(unsigned char *)
- * @p:待解封的STLV包缓冲区地址(unsigned char *)
- * @l:STLV包缓冲区长(unsigned int)
+ * @p:待解封数据的缓冲区地址(unsigned char *)
+ * @l: 待解封数据的缓冲区长(unsigned int)
  * @rl:本次解压获得的STLV完整包长度(unsigned int *)
  * @return: 0 failed; >0 解装后值的长度(unsigned int)
  * PS:对于值为TLV的包，会递归解封到值为基本类型或者字节数组为止
  */
-#define STLV_UNPACK(t , v , p , l , rl) unpack_stlv((t) , (v) , (p) , (l) , (rl));
+#define STLV_UNPACK(t , v , p , l , rl) unpack_stlv((t) , (unsigned char *)(v) , (unsigned char *)(p) , (l) , (rl))
 
 /*
  * 打印STLV包到日志

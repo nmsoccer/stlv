@@ -150,19 +150,30 @@ NO_API unsigned int pack_stlv(char type , OUT unsigned char *packed_buff , IN un
 /*
  * unpack_stlv
  * 解封STLV包
- * @type:解封的数据类型 refer STLV_T_PR_XX or STLV_T_CO_XX
+ * @info:
+ *     解封成功则>=0 填充解封的数据类型 refer STLV_T_PR_XX or STLV_T_CO_XX
+ *     解封失败则<0   填充错误码 refer STLV_UNPACK_FAIL_XX
  * @value:解封的数据
- * @packed_buff:待解封的STLV包
- * @p_len:STLV包缓冲区长
- * @p_real_len:本次解压获得的STLV完整包长度
+ * @src_buff:待解封数据的缓冲区
+ * @buff_len:待解封数据的缓冲区长
+ * @pkg_len:if not NULL,则返回本次解压获得的STLV完整包长度
  * @return: 0 failed; >0 解装后值的长度
  * ps:
  */
-NO_API unsigned int unpack_stlv(char *type , OUT unsigned char *value , IN unsigned char *packed_buff , unsigned int p_len ,
-		unsigned int *p_real_len)
+#define TEST_FILL_INFO_VALUE(pi , v) \
+do \
+{ \
+	if(pi) \
+		*pi = v; \
+} \
+while(0) \
+
+
+NO_API unsigned int unpack_stlv(int *info , OUT unsigned char *value , IN unsigned char *src_buff , unsigned int buff_len ,
+		unsigned int *pkg_len)
 {
 	int slog_fd = -1;
-	STLV_PACK *pack = (STLV_PACK *)packed_buff;
+	STLV_PACK *pack = (STLV_PACK *)src_buff;
 
 	unsigned int v_len = 0;
 	unsigned char *v_start = NULL;
@@ -177,15 +188,17 @@ NO_API unsigned int unpack_stlv(char *type , OUT unsigned char *value , IN unsig
 
 	slog_fd = penv->slog_fd;
 	/***Arg Check*/
-	if(!type || !value || !packed_buff)
+	if(!info || !value || !src_buff)
 	{
 		slog_log(slog_fd , SL_ERR , "%s failed! some arg NULL!" , __FUNCTION__);
+		TEST_FILL_INFO_VALUE(info , STLV_UNPACK_FAIL_ERR);
 		return 0;
 	}
 
-	if(p_len <= sizeof(STLV_PACK))
+	if(buff_len <= sizeof(STLV_PACK))
 	{
-		slog_log(slog_fd , SL_ERR , "%s failed! stlv pack len illegal! %d" , __FUNCTION__ , p_len);
+		slog_log(slog_fd , SL_ERR , "%s failed! stlv pack len illegal! %d" , __FUNCTION__ , buff_len);
+		TEST_FILL_INFO_VALUE(info , STLV_UNPACK_FAIL_BUFF_LEN);
 		return 0;
 	}
 
@@ -194,18 +207,21 @@ NO_API unsigned int unpack_stlv(char *type , OUT unsigned char *value , IN unsig
 	if(pack->tag.class != STLV_T_CLASS)
 	{
 		slog_log(slog_fd , SL_ERR , "%s failed! stlv pack class illegal! %d" , __FUNCTION__ , pack->tag.class);
+		TEST_FILL_INFO_VALUE(info , STLV_UNPACK_FAIL_ERR);
 		return 0;
 	}
 
 	if(pack->tag.obj==STLV_T_OBJ_PRIMITIVE && (pack->tag.num<STLV_T_PR_MIN||pack->tag.num>STLV_T_PR_MAX))
 	{
 		slog_log(slog_fd , SL_ERR , "%s failed! primitive type illegal! obj:%d type:%d" , __FUNCTION__ , pack->tag.obj , pack->tag.num);
+		TEST_FILL_INFO_VALUE(info , STLV_UNPACK_FAIL_ERR);
 		return 0;
 	}
 
 	if(pack->tag.obj==STLV_T_OBJ_COMPOS && (pack->tag.num<STLV_T_CO_MIN||pack->tag.num>STLV_T_CO_MAX))
 	{
 		slog_log(slog_fd , SL_ERR , "%s failed! constructive type illegal! obj:%d type:%d" , __FUNCTION__ , pack->tag.obj , pack->tag.num);
+		TEST_FILL_INFO_VALUE(info , STLV_UNPACK_FAIL_ERR);
 		return 0;
 	}
 
@@ -218,10 +234,11 @@ NO_API unsigned int unpack_stlv(char *type , OUT unsigned char *value , IN unsig
 	{
 		if(pack->len.value == STLV_LEN_AREA_UINT16_SIZE)
 		{
-			if(head_len + STLV_LEN_AREA_UINT16_SIZE >= p_len)
+			if(head_len + STLV_LEN_AREA_UINT16_SIZE >= buff_len)
 			{
-				slog_log(slog_fd , SL_ERR , "%s failed! packed len is not enough! p_len:%d head_len:%d extra:%d" , __FUNCTION__ , p_len ,
+				slog_log(slog_fd , SL_ERR , "%s failed! packed len is not enough! p_len:%d head_len:%d extra:%d" , __FUNCTION__ , buff_len ,
 						head_len , STLV_LEN_AREA_UINT16_SIZE);
+				TEST_FILL_INFO_VALUE(info , STLV_UNPACK_FAIL_BUFF_LEN);
 				return 0;
 			}
 			head_len += STLV_LEN_AREA_UINT16_SIZE;
@@ -229,10 +246,11 @@ NO_API unsigned int unpack_stlv(char *type , OUT unsigned char *value , IN unsig
 		}
 		else if(pack->len.value == STLV_LEN_AREA_UINT32_SIZE)
 		{
-			if(head_len + STLV_LEN_AREA_UINT32_SIZE >= p_len)
+			if(head_len + STLV_LEN_AREA_UINT32_SIZE >= buff_len)
 			{
-				slog_log(slog_fd , SL_ERR , "%s failed! packed len is not enough! p_len:%d head_len:%d extra:%d" , __FUNCTION__ , p_len ,
+				slog_log(slog_fd , SL_ERR , "%s failed! packed len is not enough! p_len:%d head_len:%d extra:%d" , __FUNCTION__ , buff_len ,
 						head_len , STLV_LEN_AREA_UINT32_SIZE);
+				TEST_FILL_INFO_VALUE(info , STLV_UNPACK_FAIL_BUFF_LEN);
 				return 0;
 			}
 			head_len += STLV_LEN_AREA_UINT32_SIZE;
@@ -241,32 +259,35 @@ NO_API unsigned int unpack_stlv(char *type , OUT unsigned char *value , IN unsig
 		else
 		{
 			slog_log(slog_fd , SL_ERR , "%s failed! multi size len.value illegal! %d" , __FUNCTION__ , pack->len.value);
+			TEST_FILL_INFO_VALUE(info , STLV_UNPACK_FAIL_ERR);
 			return 0;
 		}
 	}
 
 	//check total_size
-	if(head_len + v_len +2 >  p_len)
+	if(head_len + v_len +2 >  buff_len)
 	{
-		slog_log(slog_fd , SL_ERR , "%s failed! packed_len is not enough! p_len:%d package len:%d" , __FUNCTION__ , p_len ,
+		slog_log(slog_fd , SL_ERR , "%s failed! packed_len is not enough! p_len:%d package len:%d" , __FUNCTION__ , buff_len ,
 				head_len + v_len +2);
+		TEST_FILL_INFO_VALUE(info , STLV_UNPACK_FAIL_BUFF_LEN);
 		return 0;
 	}
 
 	//stlv real_size
-	if(p_real_len)
-		*p_real_len = (head_len + v_len + 2);
+	if(pkg_len)
+		*pkg_len = (head_len + v_len + 2);
 
 	//value start
-	v_start = packed_buff + head_len;
+	v_start = src_buff + head_len;
 
 	/***Check Sum*/
-	check_sum = ntohs(*((unsigned short *)(packed_buff+head_len+v_len)));
+	check_sum = ntohs(*((unsigned short *)(src_buff+head_len+v_len)));
 	slog_log(slog_fd , SL_DEBUG , "%s check_sum:%04X" , __FUNCTION__ , check_sum);
 	if(check_sum != _check_sum(v_start , v_len))
 	{
 		slog_log(slog_fd , SL_ERR , "%s failed! check_sum not match! pack_sum:%04X calc_sum:%04X" , __FUNCTION__ , check_sum ,
 				_check_sum(v_start , v_len));
+		TEST_FILL_INFO_VALUE(info , STLV_UNPACK_FAIL_CHECK_SUM);
 		return 0;
 	}
 
@@ -276,15 +297,15 @@ NO_API unsigned int unpack_stlv(char *type , OUT unsigned char *value , IN unsig
 	{
 		//TLV
 		if(pack->tag.num == STLV_T_CO_TLV)
-			return unpack_stlv(type , value , v_start , v_len , NULL);
+			return unpack_stlv(info , value , v_start , v_len , NULL);
 
 		//ARRAY
-		*type = STLV_T_CO_ARRAY;
+		*info = STLV_T_CO_ARRAY;
 		memcpy(value , v_start , v_len);
 		return v_len;
 	}
 
-	*type = pack->tag.num;
+	*info = pack->tag.num;
 	//primitive
 	switch(pack->tag.num)
 	{
@@ -306,7 +327,7 @@ NO_API unsigned int unpack_stlv(char *type , OUT unsigned char *value , IN unsig
 		memcpy(value , v_start , v_len);
 	break;
 	default:
-		slog_log(slog_fd , SL_ERR , "%s failed! primitive type:%d not support!" , __FUNCTION__ , *type);
+		slog_log(slog_fd , SL_ERR , "%s failed! primitive type:%d not support!" , __FUNCTION__ , *info);
 		return 0;
 	}
 	return v_len;
