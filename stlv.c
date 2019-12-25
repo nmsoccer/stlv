@@ -80,6 +80,7 @@ typedef struct
 typedef struct
 {
 	int slog_fd; //slog descriptor
+	int check_size;	//check-sum size [-1:no check; 0: all of data >0: min(size , real_value_len)]
 }STLV_ENV;
 
 static STLV_ENV stlv_env = {-1};
@@ -90,7 +91,7 @@ static unsigned int _pack_stlv_primitive(STLV_ENV *penv , char type , unsigned c
 static unsigned int _pack_stlv_construct(STLV_ENV *penv , char type , unsigned char *packed_buff , unsigned char *value , unsigned int vlen);
 static unsigned int _stlv_value_info(STLV_ENV *penv , STLV_PACK *pack , unsigned char **start);
 static unsigned short _stlv_check_sum(STLV_ENV *penv , STLV_PACK *pack);
-static unsigned short _check_sum(unsigned char *array , int len);
+static unsigned short _check_sum(unsigned char *array , int v_len);
 
 /*******************API FUNC******/
 /*
@@ -169,7 +170,7 @@ do \
 while(0) \
 
 
-NO_API unsigned int unpack_stlv(int *info , OUT unsigned char *value , IN unsigned char *src_buff , unsigned int buff_len ,
+NO_API unsigned int unpack_stlv(char *info , OUT unsigned char *value , IN unsigned char *src_buff , unsigned int buff_len ,
 		unsigned int *pkg_len)
 {
 	int slog_fd = -1;
@@ -350,6 +351,20 @@ NO_API unsigned int pack_stlv_long(unsigned char *packed_buff , unsigned char *v
 	}while(0);
 
 	return ret;
+}
+
+//STLV_CHECK_SUM_SIZE
+NO_API int set_stlv_check_size(int size)
+{
+	STLV_ENV *penv = &stlv_env;
+	/***Try Init*/
+	if(penv->slog_fd < 0)
+		_init_stlv_env(penv);
+
+	size = size<0?-1:size;
+	slog_log(penv->slog_fd , SL_INFO , "%s set check-size from %d --> %d" , __FUNCTION__ , penv->check_size , size);
+	penv->check_size = size;
+	return 0;
 }
 
 NO_API  int dump_stlv_pack(unsigned char *pack_buff)
@@ -685,7 +700,7 @@ static unsigned short _stlv_check_sum(STLV_ENV *penv , STLV_PACK *pack)
 	//*((unsigned short *)(v_start + v_len)) = htons(check_sum);
 
 	/***Return*/
-	slog_log(penv->slog_fd , SL_DEBUG , "%s check sum:0x%04X" , __FUNCTION__ , check_sum);
+	//slog_log(penv->slog_fd , SL_DEBUG , "%s check sum:0x%04X" , __FUNCTION__ , check_sum);
 	return check_sum;
 }
 
@@ -693,12 +708,25 @@ static unsigned short _stlv_check_sum(STLV_ENV *penv , STLV_PACK *pack)
 /*
  * check sum
  */
-static unsigned short _check_sum(unsigned char *array , int len)
+static unsigned short _check_sum(unsigned char *array , int v_len)
 {
 	unsigned int sum = 0;
 	unsigned short value = 0;
 	int i = 0;
+	int len = v_len;
+	STLV_ENV *penv = &stlv_env;
 
+	if(len <= 1)
+		return 0;
+
+	if(penv->check_size < 0)
+		return 0;
+
+	if(penv->check_size > 0)
+	{
+		len = v_len>penv->check_size?penv->check_size:v_len;
+		//slog_log(penv->slog_fd , SL_DEBUG , "%s check bytes is real:%d check-size:%d v_len:%d" , __FUNCTION__ , len , penv->check_size , v_len);
+	}
 	//calc each two bytes
 	while(1)
 	{

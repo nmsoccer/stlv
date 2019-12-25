@@ -50,6 +50,15 @@ typedef enum
 #define STLV_BUFF_FREE(ppack) (free((ppack)))
 
 /*
+ * 设置对数据进行CHECK-SUM校验的最大长度
+ * -1:不进行check-sum校验
+ * 0:全部数据进行校验[默认]
+ * >0:从首字节开始最多的校验字节数(如果数据不足该长度则以实际长度进行校验)
+ * @return:0:success -1:failed
+ */
+#define STLV_CHECK_SUM_SIZE(n) (set_stlv_check_size(n))
+
+/*
  * 打包STLV
  * PACK_STLV_XX
  * @p:封装后的缓冲区指针(unsigned char *)

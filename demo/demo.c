@@ -20,10 +20,11 @@ int main(int argc , char **argv)
   int i;
   char type = -1;
 
+  STLV_CHECK_SUM_SIZE(8);
   printf("value:0x%X len:%d\n" , value , sizeof(value));
   //primitive
   bf1 = STLV_BUFF_ALLOC(sizeof(value));
-  len1 = STLV_PACK_LONG(bf1 , &value);
+  len1 = (unsigned int)STLV_PACK_LONG(bf1 , (unsigned char *)&value);
   printf("pack value len is %d\n" , len1);
   STLV_DUMP_PACK(bf1);
 
@@ -56,7 +57,9 @@ int main(int argc , char **argv)
 
     //unpack
   memset(array , 0 , sizeof(array));
-  len2 = STLV_UNPACK(&type , array , bf1 , len1 , &stlv_len); 
+  //len2 = STLV_UNPACK(&type , array , bf1 , len1 , &stlv_len);
+  len2 = unpack_stlv(&type , array , bf1 , len1 , &stlv_len);
+  printf("len2:%d stlv_len:%d\n" , len2 , stlv_len);
   printf("unpack from array len:%d and result type:%d value:[%c][%s][%c] len is %d , stlv_len:%d\n" , len1 , type , array[0],&array[18] , 
   array[sizeof(array)-1] , len2 , stlv_len);
 
