@@ -43,7 +43,7 @@ extern "C"{
 #define OUT
 
 /***LOG LEVEL*/
-#define STLV_LOG_LEVEL SL_DEBUG
+#define STLV_LOG_LEVEL SL_INFO
 #define STLV_LOG_NAME	"./stlv.log"
 /*
  * TAG AREA
@@ -86,6 +86,7 @@ NO_API unsigned int pack_stlv(char type , OUT unsigned char *packed_buff , IN un
 NO_API unsigned int pack_stlv_long(unsigned char *packed_buff , unsigned char *value);
 NO_API unsigned int unpack_stlv(char *info , OUT unsigned char *value , IN unsigned char *src_buff , unsigned int buff_len ,
 		unsigned int *pkg_len);
+NO_API int set_stlv_check_size(int size);
 
 #ifdef __cplusplus
 }
