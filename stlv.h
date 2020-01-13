@@ -49,6 +49,14 @@ typedef enum
  */
 #define STLV_BUFF_FREE(ppack) (free((ppack)))
 
+
+/*
+ * 设置STLV的LOG接口
+ * 如果不设置则默认使用自己的日志(stlv.log)
+ * @n:外部打开的slog句柄
+ */
+#define STLV_SET_LOG(n) (set_stlv_log(n))
+
 /*
  * 设置对数据进行CHECK-SUM校验的最大长度
  * -1:不进行check-sum校验
@@ -57,6 +65,15 @@ typedef enum
  * @return:0:success -1:failed
  */
 #define STLV_CHECK_SUM_SIZE(n) (set_stlv_check_size(n))
+
+
+/*
+ * 不解包而获得一个STLV包的数据信息
+ * p:stlv包的地址(char *)
+ * v:stlv包内数据的地址(char **)
+ * @return:包内数据的长度
+ */
+#define STLV_VALUE_INFO(p , v) (stlv_value_info(p , v))
 
 /*
  * 打包STLV

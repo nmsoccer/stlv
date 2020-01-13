@@ -268,7 +268,7 @@ NO_API unsigned int unpack_stlv(char *info , OUT unsigned char *value , IN unsig
 	//check total_size
 	if(head_len + v_len +2 >  buff_len)
 	{
-		slog_log(slog_fd , SL_ERR , "%s failed! packed_len is not enough! p_len:%d package len:%d" , __FUNCTION__ , buff_len ,
+		slog_log(slog_fd , SL_INFO , "%s failed! packed_len is not enough! p_len:%d package len:%d" , __FUNCTION__ , buff_len ,
 				head_len + v_len +2);
 		TEST_FILL_INFO_VALUE(info , STLV_UNPACK_FAIL_BUFF_LEN);
 		return 0;
@@ -353,6 +353,18 @@ NO_API unsigned int pack_stlv_long(unsigned char *packed_buff , unsigned char *v
 	return ret;
 }
 
+//SET STLV_LOG
+NO_API int set_stlv_log(int sld)
+{
+	STLV_ENV *penv = &stlv_env;
+	if(penv->slog_fd >= 0)
+		slog_close(penv->slog_fd);
+
+	penv->slog_fd = sld;
+	return 0;
+}
+
+
 //STLV_CHECK_SUM_SIZE
 NO_API int set_stlv_check_size(int size)
 {
@@ -366,6 +378,13 @@ NO_API int set_stlv_check_size(int size)
 	penv->check_size = size;
 	return 0;
 }
+
+NO_API unsigned int stlv_value_info(char *pack , unsigned char **v_start)
+{
+	STLV_ENV *penv = &stlv_env;
+	return _stlv_value_info(penv , (STLV_PACK*)pack , v_start);
+}
+
 
 NO_API  int dump_stlv_pack(unsigned char *pack_buff)
 {
